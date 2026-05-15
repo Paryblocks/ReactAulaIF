@@ -1,0 +1,42 @@
+.cards {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 10px;
+  margin-top: -70px;
+}
+
+.wrapper {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  margin: 10px;
+  color: #2e2e2e;
+  
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 3fr 3fr 1fr 1fr; 
+  align-items: center;
+  padding: 10px 20px;
+}
+
+.header {
+  font-weight: bold;
+}
+
+.linha img {
+  width: 24px; 
+  height: auto;
+}
+
+.invertido span img {
+  transform: rotate(180deg);
+}
+
+.button {
+  all: unset;
+  cursor: pointer;
+}
