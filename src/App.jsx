@@ -8,7 +8,31 @@ import Entries from './components/Entries'
 import arrowIcon from './assets/arrow.png'
 import moneyIcon from './assets/money.png'
 
+import { useState } from 'react'
+
 function App() {
+  const [entrada, setEntrada] = useState(0)
+  const [saida, setSaida] = useState(0)
+  const [dados, setDados] = useState({descricao: '', valor: '', tipo: 'entrada'})
+
+  const [tabela, setTabela] = useState([])
+
+  const handleChange = (campo, valor) => {
+    setDados(prev => ({
+      ...prev,
+      [campo]: valor
+    }))
+  }
+
+  const handleUpdate = () => {
+    if(dados.tipo === 'entrada'){
+      setEntrada(Number(entrada) + Number(dados.valor))
+    }
+    if(dados.tipo === 'saida'){
+      setSaida(Number(saida) + Number(dados.valor))
+    }
+    setTabela([...tabela, dados])
+  }
 
   return (
     <>
@@ -16,16 +40,16 @@ function App() {
       <div className='cards'>
         <Card titulo="Entradas" 
         simbolo={arrowIcon}
-        valor="1500.00"/>
+        valor={entrada}/>
         <Card titulo="Saídas" 
         simbolo={arrowIcon}
-        valor="380.00"
+        valor={saida}
         invertido/>
         <Card titulo="Total" 
         simbolo={moneyIcon}
-        valor="1120.00"/>
+        valor={entrada - saida}/>
       </div>
-      <AddForm/>
+      <AddForm onChange={handleChange} onClick={handleUpdate}/>
       <div className='wrapper'> 
         <div className='item header'>
           <strong>Descrição</strong>
@@ -33,15 +57,17 @@ function App() {
           <strong>Tipo</strong>
         </div>
         <hr></hr>
-        <Entries
-        desc="Salário"
-        val="1500"
-        tipo={arrowIcon}/>
-        <Entries
-        desc="Alimentação"
-        val="380"
-        tipo={arrowIcon}
-        invertido/>
+        {
+        tabela.map(
+          (entry) => {
+            <Entries
+            desc={entry.descricao}
+            val={entry.valor}
+            tipo={arrowIcon}
+            invertido={entry.tipo === 'saida'}/>
+          }
+        )
+        }
       </div>
     </>
   )
