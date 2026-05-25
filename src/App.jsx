@@ -31,7 +31,25 @@ function App() {
     if(dados.tipo === 'saida'){
       setSaida(Number(saida) + Number(dados.valor))
     }
-    setTabela([...tabela, dados])
+    setTabela([...tabela, {...dados}])
+  }
+
+  const handleDelete = (indexDelete) => {
+    const confirm = window.confirm("Deseja excluir esse item?")
+    if(!confirm){
+      return
+    }else{
+      const item = tabela[indexDelete]
+      if(item.tipo === 'entrada'){
+        setEntrada(Number(entrada) - Number(item.valor))
+      }
+      if(item.tipo === 'saida'){
+        setSaida(Number(saida) - Number(item.valor))
+      }
+      setTabela((tabelaAtual) =>
+        tabelaAtual.filter((_, i) => i !== indexDelete)
+      )
+    }
   }
 
   return (
@@ -58,15 +76,15 @@ function App() {
         </div>
         <hr></hr>
         {
-        tabela.map(
-          (entry) => {
+        tabela.map((entry, index) => (
             <Entries
+            key={index}
             desc={entry.descricao}
             val={entry.valor}
             tipo={arrowIcon}
-            invertido={entry.tipo === 'saida'}/>
-          }
-        )
+            invertido={entry.tipo === 'saida'}
+            onDelete={() => handleDelete(index)}/>
+        ))
         }
       </div>
     </>
