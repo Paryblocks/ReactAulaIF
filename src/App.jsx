@@ -8,7 +8,8 @@ import Entries from './components/Entries'
 import arrowIcon from './assets/arrow.png'
 import moneyIcon from './assets/money.png'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { Route, Routes } from 'react-router-dom'
 
 function App() {
   const [entrada, setEntrada] = useState(0)
@@ -16,6 +17,23 @@ function App() {
   const [dados, setDados] = useState({descricao: '', valor: '', tipo: 'entrada'})
 
   const [tabela, setTabela] = useState([])
+
+  useEffect( () => {
+    const buscarDados = async () => {
+      const resposta = await fetch('http://localhost/backend/api.php')
+      const data = await resposta.json()
+      data.forEach(item => {
+        if(item.tipo === 'entrada'){
+          setEntrada(Number(entrada) + Number(item.valor))
+        }
+        if(item.tipo === 'saida'){
+          setSaida(Number(saida) + Number(item.valor))
+        }
+      })
+      setTabela(data)
+    }
+    buscarDados()
+  }, [])
 
   const handleChange = (campo, valor) => {
     setDados(prev => ({
@@ -55,6 +73,11 @@ function App() {
   return (
     <>
       <Header titulo="Controle Financeiro"/>
+
+      {/* <Routes> Caso fosse fazer outras páginas
+        <Route path="/" element={<Card/>}/>
+      </Routes> */}
+
       <div className='cards'>
         <Card titulo="Entradas" 
         simbolo={arrowIcon}
