@@ -14,22 +14,28 @@ import { Link, Route, Routes } from 'react-router-dom'
 function App() {
   const [entrada, setEntrada] = useState(0)
   const [saida, setSaida] = useState(0)
-  const [dados, setDados] = useState({descricao: '', valor: '', tipo: 'entrada'})
+  const [dados, setDados] = useState({id: '', descricao: '', valor: '', tipo: 'entrada'})
 
   const [tabela, setTabela] = useState([])
 
   useEffect( () => {
     const buscarDados = async () => {
-      const resposta = await fetch('http://localhost/backend/api.php')
+      const resposta = await fetch('http://localhost/backend/api.php?acao=buscar')
       const data = await resposta.json()
+
+      let somaEntrada = 0;
+      let somaSaida = 0;
+
       data.forEach(item => {
         if(item.tipo === 'entrada'){
-          setEntrada(Number(entrada) + Number(item.valor))
+          somaEntrada += Number(item.valor)
         }
         if(item.tipo === 'saida'){
-          setSaida(Number(saida) + Number(item.valor))
+          somaSaida += Number(item.valor)
         }
       })
+      setEntrada(somaEntrada)
+      setSaida(somaSaida)
       setTabela(data)
     }
     buscarDados()
@@ -42,31 +48,66 @@ function App() {
     }))
   }
 
-  const handleUpdate = () => {
-    if(dados.tipo === 'entrada'){
-      setEntrada(Number(entrada) + Number(dados.valor))
+  const handleUpdate = async () => {
+    if (!dados.descricao.trim() || !dados.valor || Number(dados.valor) <= 0) {
+      alert("Por favor, preencha todos os campos com valores válidos!")
+      return 
     }
-    if(dados.tipo === 'saida'){
-      setSaida(Number(saida) + Number(dados.valor))
+
+    try {
+      const resposta = await fetch('http://localhost/backend/api.php?acao=salvar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dados)
+      })
+      if (resposta.ok) {
+        const dadosDoBanco = await resposta.json()
+        const retornoId = dadosDoBanco.id
+
+        if(dados.tipo === 'entrada'){
+          setEntrada(Number(entrada) + Number(dados.valor))
+        }
+        if(dados.tipo === 'saida'){
+          setSaida(Number(saida) + Number(dados.valor))
+        }
+
+        const novoItem = { ...dados, id: retornoId}
+        setTabela([...tabela, novoItem])
+
+        if(dados.tipo === 'entrada'){
+          setDados({id: '', descricao: '', valor: '', tipo: 'entrada'})
+        }else{
+          setDados({id: '', descricao: '', valor: '', tipo: 'saida'})
+        }
+      }
+    } catch (error) {
+    console.error("Erro ao salvar:", error)
     }
-    setTabela([...tabela, {...dados}])
   }
 
-  const handleDelete = (indexDelete) => {
+  const handleDelete = async (item) => {
     const confirm = window.confirm("Deseja excluir esse item?")
     if(!confirm){
       return
     }else{
-      const item = tabela[indexDelete]
-      if(item.tipo === 'entrada'){
-        setEntrada(Number(entrada) - Number(item.valor))
+      try {
+        const resposta = await fetch(`http://localhost/backend/api.php?acao=excluir&id=${item.id}`)
+        if (resposta.ok){
+          if(item.tipo === 'entrada'){
+            setEntrada(Number(entrada) - Number(item.valor))
+          }
+          if(item.tipo === 'saida'){
+            setSaida(Number(saida) - Number(item.valor))
+          }
+          setTabela((tabelaAtual) =>
+            tabelaAtual.filter((t) => t.id !== item.id)
+          )
+        }
+      } catch (error) {
+        console.error("Erro ao excluir:", error)
       }
-      if(item.tipo === 'saida'){
-        setSaida(Number(saida) - Number(item.valor))
-      }
-      setTabela((tabelaAtual) =>
-        tabelaAtual.filter((_, i) => i !== indexDelete)
-      )
     }
   }
 
@@ -94,7 +135,7 @@ function App() {
         simbolo={moneyIcon}
         valor={entrada - saida}/>
       </div>
-      <AddForm onChange={handleChange} onClick={handleUpdate}/>
+      <AddForm dados={dados} onChange={handleChange} onClick={handleUpdate}/>
       <div className='wrapper'> 
         <div className='item header'>
           <strong>Descrição</strong>
@@ -103,14 +144,14 @@ function App() {
         </div>
         <hr></hr>
         {
-        tabela.map((entry, index) => (
+        tabela.map((entry) => (
             <Entries
-            key={index}
+            key={entry.id}
             desc={entry.descricao}
             val={entry.valor}
             tipo={arrowIcon}
             invertido={entry.tipo === 'saida'}
-            onDelete={() => handleDelete(index)}/>
+            onDelete={() => handleDelete(entry)}/>
         ))
         }
       </div>

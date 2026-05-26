@@ -1,18 +1,18 @@
 import React from 'react'
 import './AddForm.css'
 
-const AddForm = ({onChange, onClick}) => {
+const AddForm = ({dados, onChange, onClick}) => {
   return (
     <div className='form'>
         <form className='formAdjust'>
             <div className="input-group">
             <label htmlFor='desc'>Descrição</label>
-            <input id='desc' required onChange={e => onChange('descricao', e.target.value)}/>
+            <input id='desc' value={dados.descricao}  onChange={e => onChange('descricao', e.target.value)}/>
             </div>
 
             <div className="input-group">
             <label htmlFor='val'>Valor</label>
-            <input id='val' required type='number'onChange={e => onChange('valor', e.target.value)}/>
+            <input id='val' value={dados.valor} type='number'onChange={e => onChange('valor', e.target.value)}/>
             </div>
 
             <div className="input-group">

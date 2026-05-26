@@ -1,0 +1,16 @@
+// Criação da tabela
+CREATE TABLE registro
+(
+  id int NOT NULL AUTO_INCREMENT,
+  descricao VARCHAR(255) NOT NULL,
+  valor DOUBLE NOT NULL,
+  tipo VARCHAR(10) NOT NULL,
+  PRIMARY KEY (id)
+);
+
+// Alguns inserts base pra teste
+INSERT INTO registro (descricao, valor, tipo)
+VALUES 
+  ('Salário', 3500.00, 'entrada'),
+  ('Aluguel', 1200.00, 'saida'),
+  ('Supermercado', 450.75, 'saida');
