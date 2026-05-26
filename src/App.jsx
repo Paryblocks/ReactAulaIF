@@ -9,7 +9,7 @@ import arrowIcon from './assets/arrow.png'
 import moneyIcon from './assets/money.png'
 
 import { useEffect, useState } from 'react'
-import { Route, Routes } from 'react-router-dom'
+import { Link, Route, Routes } from 'react-router-dom'
 
 function App() {
   const [entrada, setEntrada] = useState(0)
@@ -72,12 +72,16 @@ function App() {
 
   return (
     <>
-      <Header titulo="Controle Financeiro"/>
-
-      {/* <Routes> Caso fosse fazer outras páginas
-        <Route path="/" element={<Card/>}/>
+      {/* Caso fosse fazer outras páginas, essas seriam as funções necessárias
+      <ul>
+        <li><Link to="/">Home</Link></li>
+        <li><Link to="/pagina2">Página 2</Link></li>
+      </ul>
+      <Routes> 
+        <Route path="/" element={<Componente/>}/>
       </Routes> */}
 
+      <Header titulo="Controle Financeiro"/>
       <div className='cards'>
         <Card titulo="Entradas" 
         simbolo={arrowIcon}
